@@ -49,7 +49,18 @@ def softmax(Z):
 
 # Forward pass
 def forward(X, parameters):
-    pass
+    W1, b1, W2, b2 = parameters
+
+    # Camada escondida: combinação linear + ReLU
+    Z1 = np.dot(X, W1) + b1      # (m, 784) x (784, H) + (1, H) -> (m, H)
+    A1 = relu(Z1)                # (m, H)
+
+    # Camada de saída: recebe A1 (não X) + softmax
+    Z2 = np.dot(A1, W2) + b2     # (m, H) x (H, 10) + (1, 10) -> (m, 10)
+    A2 = softmax(Z2)             # (m, 10), cada linha soma 1
+
+    # Z1, A1 e A2 são reaproveitados pelo backward; A2 (último) é a previsão
+    return Z1, A1, Z2, A2
 
 # Loss function
 def cross_entropy_loss(y_true, y_pred):
@@ -75,17 +86,3 @@ def gradient_descent_step(X, y, parameters, learning_rate=0.01):
 
 def accuracy(y_true, y_pred):
     pass
-    
-    
-
-    
-
-
-
-
-
-
-
-
-
-
