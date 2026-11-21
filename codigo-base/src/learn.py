@@ -64,7 +64,13 @@ def forward(X, parameters):
 
 # Loss function
 def cross_entropy_loss(y_true, y_pred):
-    pass
+    m = y_true.shape[0]
+    # Limita as probabilidades por baixo para evitar log(0) = -inf caso a softmax
+    # sofra underflow (ex.: taxa de aprendizado alta). Valores >= 1e-15 não mudam.
+    y_pred = np.clip(y_pred, 1e-15, 1.0)
+    # Produto elemento a elemento: com one-hot, só o log da classe correta conta
+    loss = -np.sum(y_true * np.log(y_pred)) / m
+    return float(loss)  # escalar Python, serializável em JSON pelo server.py
 
 # Backward pass
 def backward(X, y, W2, Z1, A1, A2):
@@ -85,4 +91,5 @@ def gradient_descent_step(X, y, parameters, learning_rate=0.01):
     pass
 
 def accuracy(y_true, y_pred):
-    pass
+    # Classe verdadeira (posição do 1) x classe prevista (maior probabilidade)
+    return float(np.mean(np.argmax(y_true, axis=1) == np.argmax(y_pred, axis=1)))
