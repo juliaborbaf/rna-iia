@@ -1,0 +1,67 @@
+Carregando MNIST...
+  ok (4s): treino (56000, 784), teste (14000, 784)
+[1/7] lr0.1_h64_ep500
+    época    1  perda 2.3027  acc 0.1195  (0s)
+    época   50  perda 2.1144  acc 0.4428  (12s)
+    época  100  perda 1.0912  acc 0.7628  (28s)
+    época  150  perda 0.6756  acc 0.8307  (42s)
+    época  200  perda 0.5319  acc 0.8611  (53s)
+    época  250  perda 0.4606  acc 0.8764  (69s)
+    época  300  perda 0.4180  acc 0.8866  (84s)
+    época  350  perda 0.3898  acc 0.8921  (96s)
+    época  400  perda 0.3696  acc 0.8968  (107s)
+    época  450  perda 0.3541  acc 0.8997  (117s)
+    época  500  perda 0.3417  acc 0.9021  (133s)
+[2/7] lr0.001_h64_ep200
+    época    1  perda 2.3027  acc 0.1072  (0s)
+    época   50  perda 2.3024  acc 0.1139  (16s)
+    época  100  perda 2.3021  acc 0.1195  (31s)
+    época  150  perda 2.3018  acc 0.1232  (44s)
+    época  200  perda 2.3016  acc 0.1271  (55s)
+[3/7] lr0.01_h64_ep200
+    época    1  perda 2.3027  acc 0.1088  (0s)
+    época   50  perda 2.2998  acc 0.1491  (14s)
+    época  100  perda 2.2961  acc 0.2135  (30s)
+    época  150  perda 2.2912  acc 0.2592  (45s)
+    época  200  perda 2.2840  acc 0.3061  (60s)
+[4/7] lr0.5_h64_ep200
+    época    1  perda 2.3027  acc 0.1452  (0s)
+    época   50  perda 0.6849  acc 0.7884  (18s)
+    época  100  perda 0.3380  acc 0.9024  (33s)
+    época  150  perda 0.2894  acc 0.9162  (48s)
+    época  200  perda 0.2585  acc 0.9243  (62s)
+[5/7] lr0.1_h4_ep200
+    época    1  perda 2.3028  acc 0.1496  (0s)
+    época   50  perda 2.2851  acc 0.2447  (7s)
+    época  100  perda 1.8198  acc 0.4199  (14s)
+    época  150  perda 1.2534  acc 0.5706  (21s)
+    época  200  perda 0.9421  acc 0.6926  (27s)
+[6/7] lr0.1_h16_ep200
+    época    1  perda 2.3025  acc 0.0879  (0s)
+    época   50  perda 2.2552  acc 0.2803  (9s)
+    época  100  perda 1.5156  acc 0.5908  (18s)
+    época  150  perda 0.8807  acc 0.7798  (26s)
+    época  200  perda 0.6374  acc 0.8374  (35s)
+[7/7] lr0.1_h256_ep200
+    época    1  perda 2.3036  acc 0.1510  (1s)
+    época   50  perda 1.7616  acc 0.7031  (49s)
+    época  100  perda 0.8236  acc 0.8170  (95s)
+    época  150  perda 0.5747  acc 0.8549  (143s)
+    época  200  perda 0.4755  acc 0.8763  (188s)
+
+Resumo (Seção 4)
+grupo                    valor  erro treino  acc teste    tempo
+taxa_de_aprendizado      0.001       2.3016     0.1271      55s
+taxa_de_aprendizado       0.01       2.2840     0.3061      60s
+taxa_de_aprendizado        0.1       0.5319     0.8611      53s
+taxa_de_aprendizado        0.5       0.2585     0.9243      62s
+epocas                      50       2.1144     0.4428      12s
+epocas                     100       1.0912     0.7628      28s
+epocas                     200       0.5319     0.8611      53s
+epocas                     500       0.3417     0.9021     133s
+neuronios                    4       0.9421     0.6926      27s
+neuronios                   16       0.6374     0.8374      35s
+neuronios                   64       0.5319     0.8611      53s
+neuronios                  256       0.4755     0.8763     188s
+
+Tabela salva em /home/julia/UFMG/7° semestre/IIA/TP2/codigo-base/experiments/results/summary.csv

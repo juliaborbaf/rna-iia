@@ -1,0 +1,28 @@
+Carregando MNIST...
+  ok (3s): treino (56000, 784), teste (14000, 784)
+[1/1] lr0.5_h64_ep500
+    época    1  perda 2.3027  acc 0.1452  (0s)
+    época   50  perda 0.6849  acc 0.7884  (11s)
+    época  100  perda 0.3380  acc 0.9024  (21s)
+    época  150  perda 0.2894  acc 0.9162  (38s)
+    época  200  perda 0.2585  acc 0.9243  (53s)
+    época  250  perda 0.2340  acc 0.9303  (69s)
+    época  300  perda 0.2139  acc 0.9359  (83s)
+    época  350  perda 0.1971  acc 0.9391  (98s)
+    época  400  perda 0.1829  acc 0.9434  (113s)
+    época  450  perda 0.1707  acc 0.9473  (127s)
+    época  500  perda 0.1601  acc 0.9496  (144s)
+Carregando MNIST...
+  ok (4s): treino (56000, 784), teste (14000, 784)
+[1/1] lr0.5_h256_ep500
+    época    1  perda 2.3036  acc 0.3773  (1s)
+    época   50  perda 0.4720  acc 0.8705  (46s)
+    época  100  perda 0.3290  acc 0.9067  (92s)
+    época  150  perda 0.2780  acc 0.9200  (139s)
+    época  200  perda 0.2463  acc 0.9286  (186s)
+    época  250  perda 0.2211  acc 0.9344  (235s)
+    época  300  perda 0.2006  acc 0.9402  (293s)
+    época  350  perda 0.1836  acc 0.9450  (347s)
+    época  400  perda 0.1693  acc 0.9485  (396s)
+    época  450  perda 0.1570  acc 0.9519  (444s)
+    época  500  perda 0.1462  acc 0.9544  (495s)

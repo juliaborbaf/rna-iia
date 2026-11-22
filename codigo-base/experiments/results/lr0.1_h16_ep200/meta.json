@@ -1,0 +1,11 @@
+{
+  "lr": 0.1,
+  "hidden": 16,
+  "epochs": 200,
+  "seed": 42,
+  "final_train_loss": 0.6373654812849373,
+  "final_test_accuracy": 0.8374285714285714,
+  "best_test_accuracy": 0.8374285714285714,
+  "best_epoch": 200,
+  "total_time_s": 34.67989158630371
+}

@@ -42,8 +42,8 @@ def relu_derivative(Z):
     return Z > 0
 
 def softmax(Z):
-    # Subtrai o máximo de cada linha antes da exponencial para evitar overflow.
-    # O resultado não muda, pois softmax(z - c) = softmax(z).
+    # subtrai o máximo de cada linha antes da exponencial para evitar overflow
+    # o resultado não muda, pois softmax(z - c) = softmax(z)
     exp_Z = np.exp(Z - np.max(Z, axis=1, keepdims=True))
     return exp_Z / np.sum(exp_Z, axis=1, keepdims=True)
 
@@ -51,26 +51,28 @@ def softmax(Z):
 def forward(X, parameters):
     W1, b1, W2, b2 = parameters
 
-    # Camada escondida: combinação linear + ReLU
+    # camada escondida = combinação linear + ReLU
     Z1 = np.dot(X, W1) + b1      # (m, 784) x (784, H) + (1, H) -> (m, H)
     A1 = relu(Z1)                # (m, H)
 
-    # Camada de saída: recebe A1 (não X) + softmax
+    # camada de saída = recebe A1 (não X) + softmax
     Z2 = np.dot(A1, W2) + b2     # (m, H) x (H, 10) + (1, 10) -> (m, 10)
     A2 = softmax(Z2)             # (m, 10), cada linha soma 1
 
-    # Z1, A1 e A2 são reaproveitados pelo backward; A2 (último) é a previsão
+    # Z1, A1 e A2 são reaproveitados pelo backward
+    # A2 (último) é a previsão
     return Z1, A1, Z2, A2
 
 # Loss function
 def cross_entropy_loss(y_true, y_pred):
     m = y_true.shape[0]
-    # Limita as probabilidades por baixo para evitar log(0) = -inf caso a softmax
-    # sofra underflow (ex.: taxa de aprendizado alta). Valores >= 1e-15 não mudam.
+    # limita as probabilidades por baixo para evitar log(0) = -inf caso a softmax
+    # sofra underflow
     y_pred = np.clip(y_pred, 1e-15, 1.0)
-    # Produto elemento a elemento: com one-hot, só o log da classe correta conta
+    # produto elemento a elemento
+    # com one-hot, só o log da classe correta conta
     loss = -np.sum(y_true * np.log(y_pred)) / m
-    return float(loss)  # escalar Python, serializável em JSON pelo server.py
+    return float(loss) 
 
 # Backward pass
 def backward(X, y, W2, Z1, A1, A2):
@@ -88,8 +90,26 @@ def backward(X, y, W2, Z1, A1, A2):
     return dW1, db1, dW2, db2
 
 def gradient_descent_step(X, y, parameters, learning_rate=0.01):
-    pass
+    W1, b1, W2, b2 = parameters
+
+    # 1 propagação das entradas
+    Z1, A1, Z2, A2 = forward(X, parameters)
+
+    # 2 erro da previsão atual (antes da atualização)
+    loss = cross_entropy_loss(y, A2)
+
+    # 3 gradientes (o backward já divide por m)
+    dW1, db1, dW2, db2 = backward(X, y, W2, Z1, A1, A2)
+
+    # 4 regra do gradiente descendente: w <- w - alpha * dL/dw
+    # cria arrays novos (sem -=) para não alterar os parâmetros recebidos
+    W1 = W1 - learning_rate * dW1
+    b1 = b1 - learning_rate * db1
+    W2 = W2 - learning_rate * dW2
+    b2 = b2 - learning_rate * db2
+
+    return (W1, b1, W2, b2), loss
 
 def accuracy(y_true, y_pred):
-    # Classe verdadeira (posição do 1) x classe prevista (maior probabilidade)
+    # classe verdadeira (posição do 1) x classe prevista (maior probabilidade)
     return float(np.mean(np.argmax(y_true, axis=1) == np.argmax(y_pred, axis=1)))

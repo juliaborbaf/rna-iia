@@ -5,6 +5,7 @@ Cobertura atual:
     Etapa 1 - initialize_parameters, relu, softmax (+ correção do OneHotEncoder)
     Etapa 2 - forward
     Etapa 3 - cross_entropy_loss, accuracy
+    Etapa 4 - gradient_descent_step
 
 Como rodar (a partir de codigo-base/):
     .venv/bin/python tests/test_learn.py
@@ -419,6 +420,142 @@ def test_etapa3_accuracy_compara_por_linha():
     p = learn.softmax(rng.normal(size=(50, 10)))
     ref = sum(int(np.argmax(y[i]) == np.argmax(p[i])) for i in range(50)) / 50
     assert learn.accuracy(y, p) == ref
+
+
+# ===========================================================================
+# ETAPA 4 - gradient_descent_step
+# ===========================================================================
+
+# Seção 3.5 - um passo com learning_rate=0.01
+PDF_GD_Y = np.array([[0, 1, 0, 0, 0, 0, 0, 0, 0, 0],
+                     [0, 0, 0, 0, 0, 0, 0, 1, 0, 0]])
+PDF_GD_LOSS = 2.3007908193979407
+PDF_GD_W1_FIRST3 = np.array([
+    [ 0.00489277, -0.0013802 ,  0.00647982,  0.01522034],
+    [-0.00232832, -0.00234474,  0.01579393,  0.00766823],
+    [-0.00470117,  0.00545288, -0.00465534, -0.00458549],
+])
+PDF_GD_W1_LAST3 = np.array([
+    [-0.00136562,  0.00739478, -0.01909403,  0.01318462],
+    [ 0.00067495, -0.00411447, -0.00088931, -0.00038599],
+    [-0.01731262,  0.01497452,  0.0003934 ,  0.00449739],
+])
+PDF_GD_B1 = np.array([[-4.63539605e-05, 2.45369176e-05, -1.63779507e-05, 5.55761532e-05]])
+PDF_GD_W2 = np.array([
+    [ 0.00950049, -0.01007663,  0.0047197 , -0.00269141,  0.00845266, -0.02128728,
+     -0.00100588, -0.00604321,  0.00430764,  0.00468546],
+    [-0.00718544, -0.0062819 , -0.00121602, -0.00907558,  0.00831039, -0.00380133,
+     -0.0291786 , -0.00371489, -0.01049451, -0.01642172],
+    [-0.01248018,  0.00098765,  0.01317978,  0.0030256 , -0.00617091,  0.00445233,
+     -0.00469654, -0.00599127, -0.0116493 , -0.01762391],
+    [-0.00409178,  0.00138703, -0.00116009, -0.00435282, -0.00964994,  0.00588846,
+     -0.01336337,  0.00949599, -0.01021428, -0.00771637],
+])
+PDF_GD_B2 = np.array([[-0.00099922, 0.00399859, -0.0010031 , -0.00100043, -0.0010005 ,
+                       -0.00100286, -0.00099571, 0.00399782, -0.00099769, -0.0009969 ]])
+
+
+def pdf_gd_setup():
+    """Sequência do PDF: semente 42 -> inicialização -> X da Seção 3.3 ->
+    novo X da Seção 3.5. O exemplo da 3.5 usa o SEGUNDO sorteio de X."""
+    np.random.seed(42)
+    parameters = learn.initialize_parameters(784, 4, 10)
+    np.random.randn(2, 784)        # X da Seção 3.3 (descartado)
+    X = np.random.randn(2, 784)    # X da Seção 3.5
+    return parameters, X
+
+
+def test_etapa4_gd_formato_de_retorno():
+    parameters, X = pdf_gd_setup()
+    out = learn.gradient_descent_step(X, PDF_GD_Y, parameters, learning_rate=0.01)
+    assert isinstance(out, tuple) and len(out) == 2
+    new_params, loss = out          # como o server.py desempacota
+    assert isinstance(new_params, tuple) and len(new_params) == 4
+    for new, old in zip(new_params, parameters):
+        assert new.shape == old.shape
+    assert type(loss) is float
+
+
+def test_etapa4_gd_loss_do_pdf():
+    parameters, X = pdf_gd_setup()
+    _, loss = learn.gradient_descent_step(X, PDF_GD_Y, parameters, learning_rate=0.01)
+    assert math.isclose(loss, PDF_GD_LOSS, rel_tol=0, abs_tol=1e-15)
+
+
+def test_etapa4_gd_pesos_atualizados_do_pdf():
+    parameters, X = pdf_gd_setup()
+    (W1, b1, W2, b2), _ = learn.gradient_descent_step(X, PDF_GD_Y, parameters,
+                                                      learning_rate=0.01)
+    assert np.allclose(W1[:3], PDF_GD_W1_FIRST3, atol=ATOL)
+    assert np.allclose(W1[-3:], PDF_GD_W1_LAST3, atol=ATOL)
+    assert np.allclose(b1, PDF_GD_B1, rtol=1e-8, atol=1e-13)  # valores ~1e-5
+    assert np.allclose(W2, PDF_GD_W2, atol=ATOL)
+    assert np.allclose(b2, PDF_GD_B2, atol=ATOL)
+
+
+def test_etapa4_gd_loss_e_da_previsao_antes_da_atualizacao():
+    parameters, X = pdf_gd_setup()
+    expected = learn.cross_entropy_loss(PDF_GD_Y, learn.forward(X, parameters)[-1])
+    _, loss = learn.gradient_descent_step(X, PDF_GD_Y, parameters, 0.01)
+    assert loss == expected
+
+
+def test_etapa4_gd_regra_de_atualizacao_com_ordem_correta():
+    # new = old - lr * grad, com cada gradiente aplicado ao seu parâmetro
+    # (sem dividir de novo por m - o backward já divide)
+    rng = np.random.default_rng(11)
+    X = rng.normal(size=(6, 5))
+    y = np.eye(3)[rng.integers(0, 3, size=6)]
+    params = random_parameters(rng, 5, 4, 3)
+    Z1, A1, _, A2 = learn.forward(X, params)
+    grads = learn.backward(X, y, params[2], Z1, A1, A2)
+    lr = 0.37
+    new_params, _ = learn.gradient_descent_step(X, y, params, lr)
+    for name, new, old, g in zip(["W1", "b1", "W2", "b2"], new_params, params, grads):
+        assert np.allclose(new, old - lr * g, rtol=1e-12, atol=1e-15), name
+
+
+def test_etapa4_gd_nao_altera_parametros_recebidos():
+    parameters, X = pdf_gd_setup()
+    copies = [p.copy() for p in parameters]
+    learn.gradient_descent_step(X, PDF_GD_Y, parameters, 0.01)
+    for p, c in zip(parameters, copies):
+        assert np.array_equal(p, c)
+
+
+def test_etapa4_gd_taxa_zero_nao_muda_pesos():
+    parameters, X = pdf_gd_setup()
+    new_params, _ = learn.gradient_descent_step(X, PDF_GD_Y, parameters, 0.0)
+    for new, old in zip(new_params, parameters):
+        assert np.array_equal(new, old)
+
+
+def test_etapa4_gd_usa_taxa_padrao_0_01():
+    parameters, X = pdf_gd_setup()
+    a, _ = learn.gradient_descent_step(X, PDF_GD_Y, parameters)
+    b, _ = learn.gradient_descent_step(X, PDF_GD_Y, parameters, 0.01)
+    for p, q in zip(a, b):
+        assert np.array_equal(p, q)
+
+
+def test_etapa4_gd_overfitting_em_micro_lote():
+    """Teste de sanidade: com 5 exemplos, a rede deve decorar o lote.
+    A perda tem de cair a cada iteração e terminar perto de zero.
+    lr=0.05 e 200 iterações foram escolhidos por convergirem sem oscilar
+    nesse lote (com lr=0.1 a perda sobe em 2 iterações antes de convergir)."""
+    rng = np.random.default_rng(10)
+    X = rng.random((5, 784))
+    y = np.eye(10)[[3, 1, 4, 1, 5]]
+    np.random.seed(42)
+    params = learn.initialize_parameters(784, 16, 10)
+    losses = []
+    for _ in range(200):
+        params, loss = learn.gradient_descent_step(X, y, params, learning_rate=0.05)
+        losses.append(loss)
+    assert math.isclose(losses[0], math.log(10), abs_tol=0.01)  # começa em ~ln 10
+    assert np.all(np.diff(losses) < 0), "a perda subiu em alguma iteração"
+    assert losses[-1] < 0.01
+    assert learn.accuracy(y, learn.forward(X, params)[-1]) == 1.0
 
 
 # ---------------------------------------------------------------------------

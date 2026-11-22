@@ -1,0 +1,31 @@
+% Tabela gerada por experiments/make_table.py - não editar os números à mão
+\begin{table}[t]
+\centering
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{llrrr}
+\toprule
+Variado & Valor & Erro & Acur.\ (\%) & Tempo (s) \\
+\midrule
+$\alpha$ & 0{,}001 & 2{,}3016 & 12{,}71 & 55 \\
+ & 0{,}01 & 2{,}2840 & 30{,}61 & 60 \\
+ & 0{,}1$^\dagger$ & 0{,}5319 & 86{,}11 & 53 \\
+ & 0{,}5 & 0{,}2585 & \textbf{92{,}43} & 62 \\
+\addlinespace
+Épocas & 50 & 2{,}1144 & 44{,}28 & 12 \\
+ & 100 & 1{,}0912 & 76{,}28 & 28 \\
+ & 200$^\dagger$ & 0{,}5319 & 86{,}11 & 53 \\
+ & 500 & 0{,}3417 & \textbf{90{,}21} & 133 \\
+\addlinespace
+$H$ & 4 & 0{,}9421 & 69{,}26 & 27 \\
+ & 16 & 0{,}6374 & 83{,}74 & 35 \\
+ & 64$^\dagger$ & 0{,}5319 & 86{,}11 & 53 \\
+ & 256 & 0{,}4755 & \textbf{87{,}63} & 188 \\
+\midrule
+Comb. & 0{,}5 / 64 / 500 & 0{,}1601 & 94{,}96 & 144 \\
+ & 0{,}5 / 256 / 500 & 0{,}1462 & \textbf{95{,}44} & 495 \\
+\bottomrule
+\end{tabular}
+\caption{Erro final de treino (entropia cruzada) e acurácia final de teste para taxa de aprendizado ($\alpha$), épocas e neurônios na camada escondida ($H$). Em cada grupo varia-se um hiperparâmetro e fixam-se os demais na configuração base ($^\dagger$: $\alpha=0{,}1$, $H=64$, 200 épocas). As combinações finais (Comb.) estão no formato $\alpha$\,/\,$H$\,/\,épocas. Em negrito, a maior acurácia de cada grupo.}
+\label{tab:resultados}
+\end{table}
